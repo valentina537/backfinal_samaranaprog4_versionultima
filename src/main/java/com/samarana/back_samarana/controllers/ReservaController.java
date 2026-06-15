@@ -34,9 +34,7 @@ public class ReservaController {
     })
     @GetMapping("/listar")
     public ResponseEntity<List<Reserva>> listar() {
-        // Log INFO sin parámetros (solo avisa la acción)
         log.info("Petición GET /api/reservas/listar - Solicitando listado completo de reservas.");
-
         return ResponseEntity.ok(reservaService.listarTodas());
     }
 
@@ -53,7 +51,6 @@ public class ReservaController {
     })
     @PostMapping("/guardar")
     public ResponseEntity<?> guardar(@RequestBody Reserva reserva, Authentication authentication) {
-        // Log INFO registrando los parámetros de entrada clave que vienen en la petición
         log.info("Petición POST /api/reservas/guardar - Parámetros recibidos: Cant. Personas: {}, Inicio: {}, Fin: {}, Usuario Autenticado: {}",
                 reserva.getCantidad_personas(),
                 reserva.getFecha_inicio(),
@@ -70,6 +67,7 @@ public class ReservaController {
             Reserva reservaGuardada = reservaService.guardar(reserva, authentication.getName());
             return ResponseEntity.ok(reservaGuardada);
         } catch (Exception e) {
+            log.error("ERROR al guardar reserva para usuario '{}': {}", authentication.getName(), e.getMessage(), e);
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
@@ -84,13 +82,13 @@ public class ReservaController {
     })
     @PutMapping("/cambiar-estado/{id}")
     public ResponseEntity<?> cambiarEstado(@PathVariable Long id, @RequestParam Integer nuevoEstado) {
-        // Log INFO registrando las variables de ruta y de parámetro de entrada
         log.info("Petición PUT /api/reservas/cambiar-estado/{} - Parámetros recibidos: nuevoEstado={}", id, nuevoEstado);
 
         try {
             Reserva reservaActualizada = reservaService.cambiarEstado(id, nuevoEstado);
             return ResponseEntity.ok(reservaActualizada);
         } catch (Exception e) {
+            log.error("ERROR al cambiar estado de reserva ID {}: {}", id, e.getMessage(), e);
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
